@@ -1,6 +1,11 @@
 import sys
 import os
 
+# Redirect stdout and stderr to a log file in append mode
+log_file = open('console.log', 'a')
+sys.stdout = log_file
+sys.stderr = log_file
+
 # Add the parent directory of hexaly to the path
 sys.path.append(r'C:\hexaly_13_0\bin\python')
 
@@ -16,6 +21,9 @@ os.environ['HX_LICENSE_FILE'] = r'C:\hexaly_13_0\license.dat'
 if len(sys.argv) < 2:
     print("Usage: python social_golfer.py inputFile [outputFile] [timeLimit]")
     sys.exit(1)
+
+# Log the input file being processed
+print(f"Processing input file: {sys.argv[1]}")
 
 def read_integers(filename):
     with open(filename) as f:
@@ -155,7 +163,15 @@ with hexaly.optimizer.HexalyOptimizer() as optimizer:
                 f.write("\n")
 
         # Validate the result
-        if validate_result(sys.argv[2], nb_weeks, nb_groups, nb_golfers, group_size):
+        validation_result = validate_result(sys.argv[2], nb_weeks, nb_groups, nb_golfers, group_size)
+        if validation_result:
             print("The solution is valid.")
         else:
             print("The solution is invalid.")
+
+        # Write validation result to .out file
+        with open(sys.argv[2] + '.check', 'w') as out_file:
+            out_file.write("valid\n" if validation_result else "invalid\n")
+
+# Close the log file
+log_file.close()
