@@ -1,4 +1,4 @@
-# Social Golfer Problem
+# Hexaly_Social_Golfer
 
 ## Problem
 
