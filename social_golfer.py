@@ -134,6 +134,28 @@ with hexaly.optimizer.HexalyOptimizer() as optimizer:
                     for gf1 in range(gf0 + 1, nb_golfers))
     model.minimize(obj)
 
+    # Symmetry breaking constraints
+    def symmetry_breaking_1():
+        for player in range(nb_golfers):
+            right_group = player // group_size
+            for group in range(nb_groups):
+                if group == right_group:
+                    model.constraint(model.eq(x[0][group][player], 1))
+                else:
+                    model.constraint(model.eq(x[0][group][player], 0))
+
+    def symmetry_breaking_2():
+        for week in range(1, nb_weeks):
+            for player in range(min(nb_groups, group_size)):
+                for group in range(nb_groups):
+                    if group == player:
+                        model.constraint(model.eq(x[week][group][player], 1))
+                    else:
+                        model.constraint(model.eq(x[week][group][player], 0))
+
+    symmetry_breaking_1()
+    symmetry_breaking_2()
+
     model.close()
 
     # Parameterize the optimizer
